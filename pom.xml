@@ -58,7 +58,19 @@
         <!-- 本项目-->
         <dependency>
             <groupId>com.demofactory.syscontrol</groupId>
-            <artifactId>syscontrol-base</artifactId>
+            <artifactId>syscontrol-domain</artifactId>
+            <version>${syscontrol.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.demofactory.syscontrol</groupId>
+            <artifactId>syscontrol-api</artifactId>
+            <version>${syscontrol.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.demofactory.syscontrol</groupId>
+            <artifactId>syscontrol-dao</artifactId>
             <version>${syscontrol.version}</version>
         </dependency>
     </dependencies>
