@@ -17,7 +17,7 @@ public class DemoServiceImpl implements DemoService {
 
     @Override
     public int insert(Demo demo) {
-
-        return demoDao.insert(demo);
+        demoDao.insert(demo);
+        return 1;
     }
 }
