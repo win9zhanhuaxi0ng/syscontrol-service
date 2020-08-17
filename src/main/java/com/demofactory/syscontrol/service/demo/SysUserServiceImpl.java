@@ -30,7 +30,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public int registerSysUser(String account,String password, String pwdHint) {
+    public int registerSysUser(String account,String password, String secondaryPwd,String pwdHint) {
         //查询账号密码是否为空，为空返回0
         if (account.equals("")||password.equals("")||pwdHint.equals("")){
             return 0;
@@ -39,7 +39,11 @@ public class SysUserServiceImpl implements SysUserService {
         if(sysUserDao.findByAccount(account) != null){
             return -1;
         }
-        //否则,插入新用户，返回1
+        //判断两次输入密码是否一致，不一致则返回-2
+        if (!password.equals(secondaryPwd)){
+            return -2;
+        }
+        //否则，注册成功返回1
         sysUserDao.insertNewSysUser(account,password,pwdHint);
         return 1;
     }
