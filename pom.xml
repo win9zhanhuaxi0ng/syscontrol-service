@@ -73,10 +73,6 @@
             <artifactId>syscontrol-dao</artifactId>
             <version>${syscontrol.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

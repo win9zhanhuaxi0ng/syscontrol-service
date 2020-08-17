@@ -1,5 +1,6 @@
 package com.demofactory.syscontrol.service.demo;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
 import com.demofactory.syscontrol.dao.SysUserDao;
 import com.demofactory.syscontrol.domain.SysUser;
@@ -9,7 +10,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 @Service
-public class SysUserServiceImpl implements SysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implements SysUserService {
 
     @Resource
     private SysUserDao sysUserDao;
