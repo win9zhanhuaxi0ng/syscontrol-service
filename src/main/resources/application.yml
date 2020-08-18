@@ -37,3 +37,19 @@ dubbo:
   scan:
     # 接口实现者（服务实现）包
     base-packages: com.demofactory.syscontrol.service
+
+
+mybatis-plus:
+  global-config:
+    # 是否控制台 print mybatis-plus 的 LOGO
+    banner: true
+  type-aliases-package: com.demofactory.syscontrol.domain
+  configuration:
+    # 自动驼峰命名规则 默认true 如果您的数据库命名符合规则无需使用 @TableField 注解指定数据库字段名
+    map-underscore-to-camel-case: true
+    # Mybatis一级缓存，默认为 SESSION
+    local-cache-scope: session
+    # 开启Mybatis二级缓存，默认为 true
+    cache-enabled: true
+    # sql打印
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

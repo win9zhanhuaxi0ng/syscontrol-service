@@ -1,5 +1,6 @@
 package com.demofactory.syscontrol.service.demo;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
 import com.demofactory.syscontrol.dao.SysUserDao;
@@ -9,6 +10,7 @@ import org.apache.dubbo.config.annotation.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implements SysUserService {
@@ -61,5 +63,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
             return null;
         }
         return  sysUserDao.findLastLoginTimeByAccount(account);
+    }
+
+    @Override
+    public String SelectAccountOrHint(SysUser sysUser)
+    {
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account",sysUser.getAccount());
+        queryWrapper.eq("pwd_hint",sysUser.getPwdHint());
+        List<SysUser> sysUsers = null;
+
+        return (sysUserDao.selectCount(queryWrapper)>0)?"跳转为重设密码页面":"账号错误或提示语错误";
+
     }
 }
