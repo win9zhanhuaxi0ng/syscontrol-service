@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
 import com.demofactory.syscontrol.dao.SysUserDao;
 import com.demofactory.syscontrol.domain.SysUser;
-import org.springframework.stereotype.Service;
+import org.apache.dubbo.config.annotation.Service;
+
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
