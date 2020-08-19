@@ -70,7 +70,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
     }
 
     @Override
-    public String SelectAccountOrHint(SysUser sysUser)
+    public String SelectAccountAndHint(SysUser sysUser)
     {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account",sysUser.getAccount());
