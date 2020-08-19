@@ -6,7 +6,6 @@ import com.demofactory.syscontrol.dao.BookDao;
 import com.demofactory.syscontrol.domain.Books;
 import com.demofactory.syscontrol.api.BookService;
 import org.apache.dubbo.config.annotation.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 
