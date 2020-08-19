@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: 'syscontrol-domain'
+    name: 'syscontrol-service'
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://49.235.184.142:3306/study1?characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://49.235.184.142:3306/study1?characterEncoding=utf-8&autoReconnect=true&useSSL=false&serverTimezone=Hongkong
     username: study1
     password: study1
 
