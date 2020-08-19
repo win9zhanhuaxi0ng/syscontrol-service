@@ -64,13 +64,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
         sysUserDao.updateById(sysUser);
     }
 
-    @Override
-    public LocalDateTime findLastLoginTime(String account) {
-        return null;
-    }
 
     @Override
-    public String SelectAccountAndHint(SysUser sysUser)
+    public String selectAccountAndHint(SysUser sysUser)
     {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account",sysUser.getAccount());
