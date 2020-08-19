@@ -18,51 +18,55 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
     @Resource
     private SysUserDao sysUserDao;
 
-
+    /**
+     * 登录功能根据传入的账号，查询数据库判断password和status
+     * @param sysUser 用户信息包含账号、密码
+     * @return null登录失败 sysUser登录成功
+     */
     @Override
-    public SysUser loginByAccountAndPassword(String account, String password) {
-
-        SysUser sysUser = sysUserDao.findByAccount(account);
-        if(sysUser == null){
+    public SysUser login(SysUser sysUser) {
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account",sysUser.getAccount());
+        SysUser sysUser1= sysUserDao.selectOne(queryWrapper);
+        if (sysUser1==null){
             return null;
         }
-        if (sysUser.getPassword().equals(password)){
-
-            return sysUser;
+        if (sysUser1.getPassword().equals(sysUser.getPassword())){
+                return sysUser1;
         }
         return null;
     }
 
+    /**
+     * 注册功能，根据传入的账号对数据库查找是否已存在，否，则判断两次密码是否一致，是，则插入
+     * @param sysUser 用户信息包含账号、密码、提示语
+     * @param secondaryPwd 二次密码校验
+     * @return 0二次密码校验失败 1插入成功 2用户已存在
+     */
     @Override
-    public int registerSysUser(String account,String password, String secondaryPwd,String pwdHint) {
-        //查询账号密码是否为空，为空返回0
-        if (account.equals("")||password.equals("")||pwdHint.equals("")){
-            return 0;
-        }
-        //查询账号是否存在，存在则返回-1
-        if(sysUserDao.findByAccount(account) != null){
-            return -1;
-        }
-        //判断两次输入密码是否一致，不一致则返回-2
-        if (!password.equals(secondaryPwd)){
+    public int register(SysUser sysUser,String secondaryPwd) {
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("account",sysUser.getAccount());
+        SysUser sysUser1= sysUserDao.selectOne(queryWrapper);
+        if(sysUser1==null){
+            if (sysUser.getPassword().equals(secondaryPwd)){
+                sysUserDao.insert(sysUser);
+                return 1;
+            }
             return -2;
         }
-        //否则，注册成功返回1
-        sysUserDao.insertNewSysUser(account,password,pwdHint);
-        return 1;
-    }
-    //更新上一次登录时间
-    @Override
-    public void updateLastLoginTime(LocalDateTime lastLoginTime, String account) {
-        sysUserDao.updateLastLoginTime(lastLoginTime,account);
+        return -1;
     }
 
     @Override
-    public LocalDateTime findLastLoginTimeByAccount(String account) {
-        if (account.equals("")){
-            return null;
-        }
-        return  sysUserDao.findLastLoginTimeByAccount(account);
+    public void updateLastLoginTime(SysUser sysUser) {
+        sysUser.setLastLoginTime(LocalDateTime.now());
+        sysUserDao.updateById(sysUser);
+    }
+
+    @Override
+    public LocalDateTime findLastLoginTime(String account) {
+        return null;
     }
 
     @Override
