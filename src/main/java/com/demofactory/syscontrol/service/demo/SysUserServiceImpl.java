@@ -1,6 +1,7 @@
 package com.demofactory.syscontrol.service.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
 import com.demofactory.syscontrol.dao.SysUserDao;
@@ -58,16 +59,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
         return -1;
     }
 
+    /**
+     * 更新登录时间
+     * @param sysUser 用户信息
+     */
     @Override
     public void updateLastLoginTime(SysUser sysUser) {
         sysUser.setLastLoginTime(LocalDateTime.now());
         sysUserDao.updateById(sysUser);
     }
 
-
+    /**
+     * 查询账号和提示语
+     * @param sysUser 用户信息账号、提示语
+     * @return "跳转为重设密码页面":"账号错误或提示语错误"
+     */
     @Override
-    public String selectAccountAndHint(SysUser sysUser)
-    {
+    public String selectAccountAndHint(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account",sysUser.getAccount());
         queryWrapper.eq("pwd_hint",sysUser.getPwdHint());
@@ -75,5 +83,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
 
         return (sysUserDao.selectCount(queryWrapper)>0)?"跳转为重设密码页面":"账号错误或提示语错误";
 
+    }
+
+    /**
+     *修改密码功能
+     * @param sysUser 用户账号、密码
+     * @param secondaryPwd 二次校验密码
+     * @return 1重设成功 -1二次密码输入不一致
+     */
+    @Override
+    public String updatePassword(SysUser sysUser,String secondaryPwd) {
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("password",sysUser.getPassword());
+        updateWrapper.eq("account",sysUser.getAccount());
+        if (sysUser.getPassword().equals(secondaryPwd)){
+            sysUserDao.update(sysUser,updateWrapper);
+            return "重置密码成功";
+        }
+        return "两次密码输入不一致";
     }
 }
