@@ -24,6 +24,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_name",books.getBookName());
+        queryWrapper.eq("domain_id",books.getDomainId());
         if(bookDao.selectCount(queryWrapper)>0){
             System.out.println("result------已存在该书");
             return "已存在该书";
@@ -36,7 +37,8 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     public List<Books> selectBook(Books books)
     {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("book_name",books.getBookName());
+        queryWrapper.eq(books.getBookName()!=null,"book_name",books.getBookName());
+        queryWrapper.eq(books.getDomainId()!=null,"domain_id",books.getDomainId());
         List<Books> result = null;
         try{
             result = bookDao.selectList(queryWrapper);
@@ -50,6 +52,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_name",books.getBookName());
+        queryWrapper.eq("domain_id",books.getDomainId());
         if(bookDao.selectCount(queryWrapper)>0)
         {
             bookDao.delete(queryWrapper);
@@ -57,6 +60,5 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         }
         return "不存在该书";
     }
-
 
 }
