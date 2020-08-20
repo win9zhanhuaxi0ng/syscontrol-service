@@ -5,21 +5,32 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
 import com.demofactory.syscontrol.common.utils.RegexUtil;
-import com.demofactory.syscontrol.dao.SysUserDao;
-import com.demofactory.syscontrol.domain.SysUser;
+import com.demofactory.syscontrol.dao.*;
+import com.demofactory.syscontrol.domain.*;
 import com.demofactory.syscontrol.domain.dto.SysUserDTO;
+import org.apache.catalina.User;
 import org.apache.dubbo.config.annotation.Service;
 
 
 import javax.annotation.Resource;
+import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> implements SysUserService {
 
     @Resource
     private SysUserDao sysUserDao;
+    @Resource
+    private SysDomainDao sysDomainDao;
+    @Resource
+    private SysOrgDao sysOrgDao;
+    @Resource
+    private UserBookDao userBookDao;
+    @Resource
+    private BookDao bookDao;
 
     /**
      * 登录功能根据传入的账号，查询数据库判断password和status
@@ -115,7 +126,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
     /**
      * 修改密码功能
      *
-     * @param sysUserDTO   用户DTO信息包含账号、密码、二次输入密码
+     * @param sysUserDTO 用户DTO信息包含账号、密码、二次输入密码
      * @return 重设成功 二次密码输入不一致
      */
     @Override
@@ -137,4 +148,102 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         }
         return "两次密码输入不一致";
     }
+
+    /**
+     * 查询用户所属域和组织
+     *
+     * @param sysUser 登入的用户信息
+     * @return
+     */
+    @Override
+    public String selectSysDomainAndSysOrg(SysUser sysUser) {
+
+        SysUser sysUser1 = sysUserDao.selectById(sysUser.getId());
+        if (!Objects.isNull(sysUser1.getDomainId()) && !Objects.isNull(sysUser1.getDomainId())) {
+            SysDomain sysDomain = sysDomainDao.selectById(sysUser1.getDomainId());
+            SysOrg sysOrg = sysOrgDao.selectById(sysUser1.getOrgId());
+            return sysDomain.getName() + sysOrg.getOrgName();
+        }
+        return "用户未分配域和组织";
+    }
+
+    /**
+     * 用户选择域和组织
+     *
+     * @param sysUser 用户信息+域id和组织id
+     * @return
+     */
+    @Override
+    public String insertSysDomainAndSysOrg(SysUser sysUser) {
+
+        if (Objects.isNull(sysUser.getDomainId())) {
+            return "未选择加入域";
+        }
+        if (Objects.isNull(sysUser.getOrgId())) {
+            return "未选择加入组织";
+        }
+        UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", sysUser.getId());
+        sysUserDao.update(sysUser, updateWrapper);
+        return "修改成功";
+    }
+
+    /**
+     * 用户所在域列出所有书
+     *
+     * @param sysUser
+     * @return
+     */
+    @Override
+    public List<Books> selectBooksByUserDomainId(SysUser sysUser) {
+
+        QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("domain_id", sysUser.getDomainId());
+        return bookDao.selectList(queryWrapper);
+    }
+
+    /**
+     * 用户添加书
+     *
+     * @param userBook 书+用户ID
+     * @return
+     */
+    @Override
+    public String insertBooksToUser(UserBook userBook) {
+        QueryWrapper<UserBook> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("book_id", userBook.getBookId());
+        queryWrapper.eq("user_id", userBook.getUserId());
+        if (Objects.isNull(userBookDao.selectOne(queryWrapper))) {
+            userBookDao.insert(userBook);
+            return "添加书成功";
+        }
+        return "您已添加此书";
+
+
+    }
+
+    /**
+     * 显示用户下的书列表
+     * @param sysUser
+     * @return
+     */
+    @Override
+    public List<Books> selectBooksByUserId(SysUser sysUser) {
+        List<Long> bookIds = userBookDao.selectBookIdByUserId(sysUser.getId());
+        return bookDao.selectBatchIds(bookIds);
+    }
+
+    /**
+     * 用户删除书
+     *
+     * @param userBook 书ID和用户ID
+     * @return
+     */
+    @Override
+    public String deleteBooksByUser(UserBook userBook) {
+        userBookDao.deleteById(userBook);
+        return "删除成功";
+    }
+
+
 }
