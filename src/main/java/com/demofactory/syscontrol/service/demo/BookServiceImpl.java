@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.dao.BookDao;
 import com.demofactory.syscontrol.domain.Books;
 import com.demofactory.syscontrol.api.BookService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
 import javax.annotation.Resource;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
  * @description: TODO
  * @date : 2020/8/18 11:51
  */
+@Slf4j
 @Service
 public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements BookService {
     @Resource
@@ -26,10 +28,11 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         queryWrapper.eq("book_name",books.getBookName());
         queryWrapper.eq("domain_id",books.getDomainId());
         if(bookDao.selectCount(queryWrapper)>0){
-            System.out.println("result------已存在该书");
+            log.info("result------已存在该书");
             return "已存在该书";
         }
         bookDao.insert(books);
+        log.info("result------插入成功");
         return "插入成功";
     }
 
@@ -48,16 +51,17 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public String deleteBook(Books books) {
+    public String deleteBook(Long id) {
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("book_name",books.getBookName());
-        queryWrapper.eq("domain_id",books.getDomainId());
+        queryWrapper.eq("id",id);
         if(bookDao.selectCount(queryWrapper)>0)
         {
             bookDao.delete(queryWrapper);
+            log.info("result------删除成功");
             return "删除成功";
         }
+        log.info("result------不存在该书");
         return "不存在该书";
     }
 

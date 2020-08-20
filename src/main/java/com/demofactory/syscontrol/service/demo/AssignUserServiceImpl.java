@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.AssignUserService;
 import com.demofactory.syscontrol.dao.AssignUserDao;
 import com.demofactory.syscontrol.domain.SysUser;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import java.util.List;
  * @description: TODO
  * @date : 2020/8/19 13:50
  */
+@Slf4j
 @Service
 public class AssignUserServiceImpl extends ServiceImpl<AssignUserDao, SysUser> implements AssignUserService {
     @Resource
@@ -38,6 +40,7 @@ public class AssignUserServiceImpl extends ServiceImpl<AssignUserDao, SysUser> i
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("account",sysUser.getAccount());
         assignUserDao.update(sysUser,updateWrapper);
+        log.info("result------修改成功");
         return "修改成功";
     }
 
