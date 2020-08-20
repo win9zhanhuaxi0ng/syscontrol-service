@@ -80,9 +80,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
         queryWrapper.eq("account",sysUser.getAccount());
         queryWrapper.eq("pwd_hint",sysUser.getPwdHint());
         List<SysUser> sysUsers = null;
-
-        return (sysUserDao.selectCount(queryWrapper)>0)?"跳转为重设密码页面":"账号错误或提示语错误";
-
+        int status = 1;
+        try {
+            sysUsers = sysUserDao.selectList(queryWrapper);
+        } catch (Exception ex) {
+        }
+        for (SysUser item : sysUsers
+        ) {
+            status = item.getStatus();
+        }
+        return (sysUsers != null && sysUsers.size() != 0) ? ((status == 1) ?
+                "跳转为重设密码页面" : "账号已被停用或删除,请与管理员联系") : "账号错误或提示语错误";
     }
 
     /**
