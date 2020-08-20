@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
+import com.demofactory.syscontrol.common.utils.RegexUtil;
 import com.demofactory.syscontrol.dao.SysUserDao;
 import com.demofactory.syscontrol.domain.SysUser;
 import org.apache.dubbo.config.annotation.Service;
@@ -25,17 +26,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
      * @return null登录失败 sysUser登录成功
      */
     @Override
-    public SysUser login(SysUser sysUser) {
+    public String login(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account",sysUser.getAccount());
         SysUser sysUser1= sysUserDao.selectOne(queryWrapper);
         if (sysUser1==null){
-            return null;
+            return "账号不存在";
         }
         if (sysUser1.getPassword().equals(sysUser.getPassword())){
-                return sysUser1;
+                if (sysUser1.getStatus()==1){
+                    LocalDateTime localDateTime = sysUser1.getLastLoginTime();
+                    sysUser1.setLastLoginTime(LocalDateTime.now());
+                    sysUserDao.updateById(sysUser1);
+                    if (localDateTime==null){
+                        return "欢迎您第一次登录";
+                    }
+                    //重新设置登录时间
+                    return "登录成功,您上次登录时间为："+localDateTime;
+                }
+                return "您的账号已被停用或删除";
         }
-        return null;
+        return "两次密码输入不一致";
     }
 
     /**
@@ -45,18 +56,29 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
      * @return 0二次密码校验失败 1插入成功 2用户已存在
      */
     @Override
-    public int register(SysUser sysUser,String secondaryPwd) {
+    public String register(SysUser sysUser,String secondaryPwd) {
+        //正则表达式验证
+        if (RegexUtil.checkRegex(RegexUtil.REGEX_EMAIL,sysUser.getAccount())) {
+            sysUser.setUserEmail(sysUser.getAccount());
+        } else if (RegexUtil.checkRegex(RegexUtil.REGEX_MOBILE,sysUser.getAccount())) {
+            sysUser.setUserPhone(sysUser.getAccount());
+        } else {
+            return "账号格式不符合！";
+        }
+        if (!RegexUtil.checkRegex(RegexUtil.REGEX_PASSWORD,sysUser.getPassword())){
+            return "密码格式不符合！";
+        }
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account",sysUser.getAccount());
         SysUser sysUser1= sysUserDao.selectOne(queryWrapper);
         if(sysUser1==null){
             if (sysUser.getPassword().equals(secondaryPwd)){
                 sysUserDao.insert(sysUser);
-                return 1;
+                return "注册成功";
             }
-            return -2;
+            return "两次密码输入不一致";
         }
-        return -1;
+        return "账号已存在";
     }
 
     /**
@@ -65,8 +87,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUser> implemen
      */
     @Override
     public void updateLastLoginTime(SysUser sysUser) {
-        sysUser.setLastLoginTime(LocalDateTime.now());
-        sysUserDao.updateById(sysUser);
+
     }
 
     /**

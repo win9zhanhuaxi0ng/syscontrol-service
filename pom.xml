@@ -93,6 +93,12 @@
             <artifactId>syscontrol-dao</artifactId>
             <version>${syscontrol.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.demofactory.syscontrol</groupId>
+            <artifactId>syscontrol-common</artifactId>
+            <version>${syscontrol.version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
