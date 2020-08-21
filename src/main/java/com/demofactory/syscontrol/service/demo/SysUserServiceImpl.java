@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.SysUserService;
+import com.demofactory.syscontrol.common.Result;
 import com.demofactory.syscontrol.common.utils.RegexUtil;
 import com.demofactory.syscontrol.dao.*;
 import com.demofactory.syscontrol.domain.*;
 import com.demofactory.syscontrol.domain.dto.SysUserDTO;
 import org.apache.catalina.User;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
 
 
@@ -39,27 +41,35 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return
      */
     @Override
-    public String login(SysUser sysUser) {
+    public Result login(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account", sysUser.getAccount());
         SysUser sysUser1 = sysUserDao.selectOne(queryWrapper);
+        Result result = new Result();
         if (sysUser1 == null) {
-            return "账号或密码错误";
+            result.setMessage("账号或密码错误");
+            return result;
         }
         if (sysUser1.getPassword().equals(sysUser.getPassword())) {
             if (sysUser1.getStatus() == 1) {
                 LocalDateTime localDateTime = sysUser1.getLastLoginTime();
+                //重新设置登录时间
                 sysUser1.setLastLoginTime(LocalDateTime.now());
                 sysUserDao.updateById(sysUser1);
                 if (localDateTime == null) {
-                    return "欢迎您第一次登录";
+                    result.setMessage("欢迎您第一次登录");
+                    result.setSuccess(true);
+                    return result;
                 }
-                //重新设置登录时间
-                return "登录成功,您上次登录时间为：" + localDateTime;
+                result.setSuccess(true);
+                result.setMessage("登录成功,您上次登录时间为：" + localDateTime);
+                return result;
             }
-            return "您的账号已被停用或删除";
+            result.setMessage("您的账号已被停用或删除");
+            return result;
         }
-        return "账号或密码错误";
+        result.setMessage("账号或密码错误");
+        return result;
     }
 
     /**
@@ -105,22 +115,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return "跳转为重设密码页面":"账号错误或提示语错误"
      */
     @Override
-    public String selectAccountAndHint(SysUser sysUser) {
+    public Result selectAccountAndHint(SysUser sysUser) {
+        Result result = new Result();
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account", sysUser.getAccount());
-        queryWrapper.eq("pwd_hint", sysUser.getPwdHint());
-        List<SysUser> sysUsers = null;
-        int status = 1;
-        try {
-            sysUsers = sysUserDao.selectList(queryWrapper);
-        } catch (Exception ex) {
+        SysUser sysUser1 = sysUserDao.selectOne(queryWrapper);
+        if (Objects.isNull(sysUser1)){
+            result.setMessage("账号不存在");
+            return result;
         }
-        for (SysUser item : sysUsers
-        ) {
-            status = item.getStatus();
+        if (sysUser1.getStatus()!=1){
+            result.setMessage("账号已停用或删除");
+            return result;
         }
-        return (sysUsers != null && sysUsers.size() != 0) ? ((status == 1) ?
-                "跳转为重设密码页面" : "账号已被停用或删除,请与管理员联系") : "账号错误或提示语错误";
+        if (sysUser1.getPwdHint().equals(sysUser.getPwdHint())){
+            result.setMessage("验证成功");
+            result.setSuccess(true);
+            return result;
+        }
+        result.setMessage("验证提示语失败");
+        return result;
     }
 
     /**
