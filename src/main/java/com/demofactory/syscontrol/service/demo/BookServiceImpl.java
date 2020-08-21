@@ -7,6 +7,7 @@ import com.demofactory.syscontrol.domain.Books;
 import com.demofactory.syscontrol.api.BookService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.Service;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -22,12 +23,11 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     private BookDao bookDao;
 
     @Override
-    public String insertBook(Books books)
-    {
+    public String insertBook(Books books) {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("book_name",books.getBookName());
-        queryWrapper.eq("domain_id",books.getDomainId());
-        if(bookDao.selectCount(queryWrapper)>0){
+        queryWrapper.eq("book_name", books.getBookName());
+        queryWrapper.eq("domain_id", books.getDomainId());
+        if (bookDao.selectCount(queryWrapper) > 0) {
             log.info("result------已存在该书");
             return "已存在该书";
         }
@@ -37,15 +37,14 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public List<Books> selectBook(Books books)
-    {
+    public List<Books> selectBook(Books books) {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(books.getBookName()!=null,"book_name",books.getBookName());
-        queryWrapper.eq(books.getDomainId()!=null,"domain_id",books.getDomainId());
+        queryWrapper.eq(books.getBookName() != null, "book_name", books.getBookName());
+        queryWrapper.eq(books.getDomainId() != null, "domain_id", books.getDomainId());
         List<Books> result = null;
-        try{
+        try {
             result = bookDao.selectList(queryWrapper);
-        }catch (Exception ex){
+        } catch (Exception ex) {
         }
         return result;
     }
@@ -54,9 +53,8 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     public String deleteBook(Long id) {
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id",id);
-        if(bookDao.selectCount(queryWrapper)>0)
-        {
+        queryWrapper.eq("id", id);
+        if (bookDao.selectCount(queryWrapper) > 0) {
             bookDao.delete(queryWrapper);
             log.info("result------删除成功");
             return "删除成功";
