@@ -22,7 +22,8 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain> implements com.demofactory.syscontrol.api.DomainStatusService {
+public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain> implements com.demofactory.syscontrol.api.DomainStatusService
+{
     @Resource
     private SysDomainDao sysDomainDao;
 
@@ -33,7 +34,8 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
     private SysUserDao sysUserDao;
 
     @Override
-    public String domainUpdate(SysDomain sysDomain) {
+    public String domainUpdate(SysDomain sysDomain)
+    {
         UpdateWrapper<SysDomain> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysDomain.getId());
         sysDomainDao.update(sysDomain, updateWrapper);
@@ -50,22 +52,27 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
         updateWrapper2.eq("domain_id", sysDomain.getId());
         sysUserDao.update(sysUser, updateWrapper2);
         log.info("result------修改成功");
-        return (sysDomain.getStatus()==1)?
-                "启用成功":((sysDomain.getStatus()==2)?"禁用成功":"删除成功");
+        return (sysDomain.getStatus() == 1) ?
+                "启用成功" : ((sysDomain.getStatus() == 2) ? "禁用成功" : "删除成功");
     }
+
     @Override
-    public List<SysDomain> selectSysDomain(SysDomain sysDomain){
+    public List<SysDomain> selectSysDomain(SysDomain sysDomain)
+    {
         List<SysDomain> sysDomains = null;
         QueryWrapper<SysDomain> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(!Objects.isNull(sysDomain.getId()),"id",sysDomain.getId());
-        sysDomains =sysDomainDao.selectList(queryWrapper);
+        queryWrapper.eq(!Objects.isNull(sysDomain.getId()), "id", sysDomain.getId());
+        sysDomains = sysDomainDao.selectList(queryWrapper);
         return sysDomains;
     }
+
     @Override
-    public Result insertSysDomain(SysDomain sysDomain){
+    public Result insertSysDomain(SysDomain sysDomain)
+    {
         QueryWrapper<SysDomain> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name",sysDomain.getName());
-        if (sysDomainDao.selectCount(queryWrapper)>0){
+        queryWrapper.eq("name", sysDomain.getName());
+        if (sysDomainDao.selectCount(queryWrapper) > 0)
+        {
             log.info("result------已存在该域");
             return Result.failure("已存在该域");
         }

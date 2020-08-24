@@ -21,16 +21,19 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements BookService {
+public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements BookService
+{
     @Resource
     private BookDao bookDao;
 
     @Override
-    public Result insertBook(Books books) {
+    public Result insertBook(Books books)
+    {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_name", books.getBookName());
         queryWrapper.eq("domain_id", books.getDomainId());
-        if (bookDao.selectCount(queryWrapper) > 0) {
+        if (bookDao.selectCount(queryWrapper) > 0)
+        {
             log.info("result------已存在该书");
             return Result.failure("已存在该书");
         }
@@ -40,24 +43,29 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public List<Books> selectBook(Books books) {
+    public List<Books> selectBook(Books books)
+    {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(!StringUtils.isBlank(books.getBookName()), "book_name", books.getBookName());
         queryWrapper.eq(!Objects.isNull(books.getDomainId()), "domain_id", books.getDomainId());
         List<Books> result = null;
-        try {
+        try
+        {
             result = bookDao.selectList(queryWrapper);
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
         }
         return result;
     }
 
     @Override
-    public Result deleteBook(Long id) {
+    public Result deleteBook(Long id)
+    {
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
-        if (bookDao.selectCount(queryWrapper) > 0) {
+        if (bookDao.selectCount(queryWrapper) > 0)
+        {
             bookDao.delete(queryWrapper);
             log.info("result------删除成功");
             return Result.OK("删除成功");

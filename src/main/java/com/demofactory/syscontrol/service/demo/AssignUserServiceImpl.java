@@ -21,12 +21,14 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class AssignUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> implements AssignUserService {
+public class AssignUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> implements AssignUserService
+{
     @Resource
     private SysUserDao sysUserDao;
 
     @Override
-    public List<SysUser> selectAssignUser(SysUser sysUser) {
+    public List<SysUser> selectAssignUser(SysUser sysUser)
+    {
         List<SysUser> sysUsers = null;
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(!Objects.isNull(sysUser.getDomainId()), "domain_id", sysUser.getDomainId());
@@ -36,7 +38,8 @@ public class AssignUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impl
     }
 
     @Override
-    public Result updateAssignUser(SysUser sysUser) {
+    public Result updateAssignUser(SysUser sysUser)
+    {
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("account", sysUser.getAccount());
         sysUserDao.update(sysUser, updateWrapper);
