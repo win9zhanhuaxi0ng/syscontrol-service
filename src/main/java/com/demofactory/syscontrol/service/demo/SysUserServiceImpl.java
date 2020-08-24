@@ -79,21 +79,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return 二次密码校验失败 插入成功 用户已存在
      */
     @Override
-    public String register(SysUserDTO sysUserDTO) {
+    public Result register(SysUserDTO sysUserDTO) {
         SysUser sysUser = new SysUser();
         sysUser.setAccount(sysUserDTO.getAccount());
         sysUser.setPassword(sysUserDTO.getPassword());
         sysUser.setPwdHint(sysUserDTO.getPwdHint());
+        Result result = new Result();
         //正则表达式验证
         if (RegexUtil.checkRegex(RegexUtil.REGEX_EMAIL, sysUser.getAccount())) {
             sysUser.setUserEmail(sysUser.getAccount());
         } else if (RegexUtil.checkRegex(RegexUtil.REGEX_MOBILE, sysUser.getAccount())) {
             sysUser.setUserPhone(sysUser.getAccount());
         } else {
-            return "账号格式不符合！";
+            result.setMessage("账号格式不符合");
+            return result;
         }
         if (!RegexUtil.checkRegex(RegexUtil.REGEX_PASSWORD, sysUser.getPassword())) {
-            return "密码格式不符合！";
+            result.setMessage("密码格式不符合");
+            return result;
         }
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account", sysUser.getAccount());
@@ -101,11 +104,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         if (sysUser1 == null) {
             if (sysUser.getPassword().equals(sysUserDTO.getSecondaryPwd())) {
                 sysUserDao.insert(sysUser);
-                return "注册成功";
+                result.setMessage("注册成功");
+                result.setSuccess(true);
+                return result;
             }
-            return "两次密码输入不一致";
+            result.setMessage("两次密码输入不一致");
+            return result;
         }
-        return "账号已存在";
+        result.setMessage("账号已存在");
+        return result;
     }
 
     /**
@@ -170,15 +177,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return
      */
     @Override
-    public String selectSysDomainAndSysOrg(SysUser sysUser) {
-
+    public Result selectSysDomainAndSysOrg(SysUser sysUser) {
+        Result result = new Result();
         SysUser sysUser1 = sysUserDao.selectById(sysUser.getId());
-        if (!Objects.isNull(sysUser1.getDomainId()) && !Objects.isNull(sysUser1.getDomainId())) {
+        if (!Objects.isNull(sysUser1.getDomainId()) && !Objects.isNull(sysUser1.getOrgId())) {
             SysDomain sysDomain = sysDomainDao.selectById(sysUser1.getDomainId());
             SysOrg sysOrg = sysOrgDao.selectById(sysUser1.getOrgId());
-            return sysDomain.getName() + sysOrg.getOrgName();
+            result.setMessage("所属域："+sysDomain.getName()+"所属组织："+sysOrg.getOrgName());
+            result.setSuccess(true);
+            return result;
         }
-        return "用户未分配域和组织";
+        result.setMessage("用户未分配域和组织");
+        return result;
     }
 
     /**
