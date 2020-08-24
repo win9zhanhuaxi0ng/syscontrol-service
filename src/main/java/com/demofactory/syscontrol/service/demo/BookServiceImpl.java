@@ -2,14 +2,17 @@ package com.demofactory.syscontrol.service.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.demofactory.syscontrol.common.Result;
 import com.demofactory.syscontrol.dao.BookDao;
 import com.demofactory.syscontrol.domain.Books;
 import com.demofactory.syscontrol.api.BookService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : Hanamaru
@@ -23,24 +26,24 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     private BookDao bookDao;
 
     @Override
-    public String insertBook(Books books) {
+    public Result insertBook(Books books) {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_name", books.getBookName());
         queryWrapper.eq("domain_id", books.getDomainId());
         if (bookDao.selectCount(queryWrapper) > 0) {
             log.info("result------已存在该书");
-            return "已存在该书";
+            return Result.failure("已存在该书");
         }
         bookDao.insert(books);
         log.info("result------插入成功");
-        return "插入成功";
+        return Result.OK("插入成功");
     }
 
     @Override
     public List<Books> selectBook(Books books) {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(books.getBookName() != null, "book_name", books.getBookName());
-        queryWrapper.eq(books.getDomainId() != null, "domain_id", books.getDomainId());
+        queryWrapper.eq(!StringUtils.isBlank(books.getBookName()), "book_name", books.getBookName());
+        queryWrapper.eq(!Objects.isNull(books.getDomainId()), "domain_id", books.getDomainId());
         List<Books> result = null;
         try {
             result = bookDao.selectList(queryWrapper);
@@ -50,17 +53,17 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public String deleteBook(Long id) {
+    public Result deleteBook(Long id) {
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         if (bookDao.selectCount(queryWrapper) > 0) {
             bookDao.delete(queryWrapper);
             log.info("result------删除成功");
-            return "删除成功";
+            return Result.OK("删除成功");
         }
         log.info("result------不存在该书");
-        return "不存在该书";
+        return Result.failure("不存在该书");
     }
 
 }
