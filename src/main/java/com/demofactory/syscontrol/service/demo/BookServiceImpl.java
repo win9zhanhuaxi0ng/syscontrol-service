@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.common.ObjResult;
 import com.demofactory.syscontrol.common.Result;
 import com.demofactory.syscontrol.dao.BookDao;
+import com.demofactory.syscontrol.dao.SysDomainDao;
 import com.demofactory.syscontrol.domain.Books;
 import com.demofactory.syscontrol.api.BookService;
+import com.demofactory.syscontrol.domain.SysDomain;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
@@ -27,12 +29,22 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     @Resource
     private BookDao bookDao;
 
+    @Resource
+    private SysDomainDao sysDomainDao;
+
     @Override
     public ObjResult<String> insertBook(Books books)
     {
+        QueryWrapper<SysDomain> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("id", books.getDomainId());
+        if(sysDomainDao.selectCount(queryWrapper1)==0)
+        {
+            log.info("result------不存在该域");
+            return ObjResult.failure("不存在该域");
+        }
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("book_name", books.getBookName());
         queryWrapper.eq("domain_id", books.getDomainId());
+        queryWrapper.eq("book_name", books.getBookName());
         if (bookDao.selectCount(queryWrapper) > 0)
         {
             log.info("result------已存在该书");
