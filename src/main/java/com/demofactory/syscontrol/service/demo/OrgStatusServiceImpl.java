@@ -37,7 +37,7 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
     private SysUserDao sysUserDao;
 
     @Override
-    public String orgStatusUpdate(SysOrg sysOrg)
+    public Result orgStatusUpdate(SysOrg sysOrg)
     {
         UpdateWrapper<SysOrg> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysOrg.getId());
@@ -48,8 +48,8 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
         updateWrapper1.eq("org_id", sysOrg.getId());
         sysUserDao.update(sysUser, updateWrapper1);
         log.info("result------成功");
-        return (sysOrg.getStatus() == 1) ?
-                "启用成功" : ((sysOrg.getStatus() == 2) ? "禁用成功" : "删除成功");
+        return Result.OK((sysOrg.getStatus() == 1) ?
+                "启用成功" : ((sysOrg.getStatus() == 2) ? "禁用成功" : "删除成功"));
     }
 
 

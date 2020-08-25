@@ -34,7 +34,7 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
     private SysUserDao sysUserDao;
 
     @Override
-    public String domainUpdate(SysDomain sysDomain)
+    public Result domainUpdate(SysDomain sysDomain)
     {
         UpdateWrapper<SysDomain> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysDomain.getId());
@@ -52,8 +52,8 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
         updateWrapper2.eq("domain_id", sysDomain.getId());
         sysUserDao.update(sysUser, updateWrapper2);
         log.info("result------修改成功");
-        return (sysDomain.getStatus() == 1) ?
-                "启用成功" : ((sysDomain.getStatus() == 2) ? "禁用成功" : "删除成功");
+        return Result.OK((sysDomain.getStatus() == 1) ?
+                "启用成功" : ((sysDomain.getStatus() == 2) ? "禁用成功" : "删除成功"));
     }
 
     @Override
