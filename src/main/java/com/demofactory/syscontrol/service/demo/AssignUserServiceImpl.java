@@ -28,14 +28,14 @@ public class AssignUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impl
     private SysUserDao sysUserDao;
 
     @Override
-    public List<SysUser> selectAssignUser(SysUser sysUser)
+    public ObjResult<List<SysUser>> selectAssignUser(SysUser sysUser)
     {
         List<SysUser> sysUsers = null;
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(!Objects.isNull(sysUser.getDomainId()), "domain_id", sysUser.getDomainId());
         queryWrapper.eq(!Objects.isNull(sysUser.getOrgId()), "org_id", sysUser.getOrgId());
         sysUsers = sysUserDao.selectList(queryWrapper);
-        return sysUsers;
+        return ObjResult.success(sysUsers,"查询成功");
     }
 
     @Override

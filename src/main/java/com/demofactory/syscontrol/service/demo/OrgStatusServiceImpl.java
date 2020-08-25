@@ -56,7 +56,7 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
 
 
     @Override
-    public List<SysOrg> selectSysOrg(SysOrg sysOrg)
+    public ObjResult<List<SysOrg>> selectSysOrg(SysOrg sysOrg)
     {
         List<SysOrg> sysOrgs = null;
         QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
@@ -64,7 +64,7 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
         queryWrapper.eq(!Objects.isNull(sysOrg.getDomainId()), "domain_id", sysOrg.getDomainId());
         sysOrgs = sysOrgDao.selectList(queryWrapper);
 
-        return sysOrgs;
+        return ObjResult.success(sysOrgs,"查询成功");
     }
 
     @Override

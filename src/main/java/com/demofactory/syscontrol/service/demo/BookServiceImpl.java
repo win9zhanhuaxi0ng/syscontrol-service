@@ -44,7 +44,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public List<Books> selectBook(Books books)
+    public ObjResult<List<Books>> selectBook(Books books)
     {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(!StringUtils.isBlank(books.getBookName()), "book_name", books.getBookName());
@@ -56,7 +56,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         } catch (Exception ex)
         {
         }
-        return result;
+        return ObjResult.success(result,"查询成功");
     }
 
     @Override

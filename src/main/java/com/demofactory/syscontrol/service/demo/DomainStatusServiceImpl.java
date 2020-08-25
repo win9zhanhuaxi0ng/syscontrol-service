@@ -59,13 +59,12 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
     }
 
     @Override
-    public List<SysDomain> selectSysDomain(SysDomain sysDomain)
+    public ObjResult<List<SysDomain>> selectSysDomain(SysDomain sysDomain)
     {
         List<SysDomain> sysDomains = null;
         QueryWrapper<SysDomain> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(!Objects.isNull(sysDomain.getId()), "id", sysDomain.getId());
-        sysDomains = sysDomainDao.selectList(queryWrapper);
-        return sysDomains;
+        return ObjResult.success(sysDomainDao.selectList(queryWrapper),"查询成功");
     }
 
     @Override
