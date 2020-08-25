@@ -9,13 +9,10 @@ import com.demofactory.syscontrol.common.utils.RegexUtil;
 import com.demofactory.syscontrol.dao.*;
 import com.demofactory.syscontrol.domain.*;
 import com.demofactory.syscontrol.domain.dto.SysUserDTO;
-import org.apache.catalina.User;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
 
 
 import javax.annotation.Resource;
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -198,32 +195,60 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return
      */
     @Override
-    public String insertSysDomainAndSysOrg(SysUser sysUser) {
+    public Result insertSysDomainAndSysOrg(SysUser sysUser) {
+        Result result = new Result();
 
         if (Objects.isNull(sysUser.getDomainId())) {
-            return "未选择加入域";
+            result.setMessage("未选择加入域");
+            return result;
         }
         if (Objects.isNull(sysUser.getOrgId())) {
-            return "未选择加入组织";
+            result.setMessage("未选择加入组织");
+            return result;
         }
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysUser.getId());
         sysUserDao.update(sysUser, updateWrapper);
-        return "修改成功";
+        result.setMessage("加入成功");
+        result.setSuccess(true);
+        return result;
     }
 
     /**
-     * 用户所在域列出所有书
+     * 当前域下，用户未添加的书
      *
-     * @param sysUser
+     * @param
      * @return
      */
     @Override
-    public List<Books> selectBooksByUserDomainId(SysUser sysUser) {
-
-        QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("domain_id", sysUser.getDomainId());
-        return bookDao.selectList(queryWrapper);
+    public Result selectBooksByUserDomainId(SysUser sysUser) {
+        Result result = new Result();
+        SysUser sysUser1 = sysUserDao.selectById(sysUser);
+        if (Objects.isNull(sysUser1.getDomainId())){
+            result.setMessage("请先加入域和组织");
+            return result;
+        }
+        List<Long> list = bookDao.selectBookIdByDomainId(sysUser1.getDomainId());
+        if (list.isEmpty()){
+            result.setSuccess(true);
+            return result;
+        }
+        List<Long> list1 = userBookDao.selectBookIdByUserId(sysUser1.getId());
+        if (list1.isEmpty()){
+            result.setData(bookDao.selectBatchIds(list));
+            result.setSuccess(true);
+            return result;
+        }
+        for (Long l:list1){
+            list.remove(l);
+        }
+        if (list.isEmpty()){
+            result.setSuccess(true);
+            return result;
+        }
+        result.setData(bookDao.selectBatchIds(list));
+        result.setSuccess(true);
+        return result;
     }
 
     /**
@@ -233,41 +258,66 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return
      */
     @Override
-    public String insertBooksToUser(UserBook userBook) {
+    public Result insertBooksToUser(UserBook userBook) {
+        Result result = new Result();
         QueryWrapper<UserBook> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_id", userBook.getBookId());
         queryWrapper.eq("user_id", userBook.getUserId());
         if (Objects.isNull(userBookDao.selectOne(queryWrapper))) {
             userBookDao.insert(userBook);
-            return "添加书成功";
+            result.setMessage("添加成功");
+            result.setSuccess(true);
+            return result;
         }
-        return "您已添加此书";
+        result.setMessage("您已添加此书");
+        return result;
 
 
     }
 
     /**
-     * 显示用户下的书列表
+     * 用户已添加的书
      *
      * @param sysUser
      * @return
      */
     @Override
-    public List<Books> selectBooksByUserId(SysUser sysUser) {
+    public Result selectBooksByUserId(SysUser sysUser) {
+        Result result = new Result();
+        SysUser sysUser1 = sysUserDao.selectById(sysUser);
+        if (Objects.isNull(sysUser1.getDomainId())){
+            result.setMessage("请先加入域和组织");
+            return result;
+        }
         List<Long> bookIds = userBookDao.selectBookIdByUserId(sysUser.getId());
-        return bookDao.selectBatchIds(bookIds);
+        if (bookIds.isEmpty()){
+            result.setSuccess(true);
+            return result;
+        }
+        result.setData(bookDao.selectBatchIds(bookIds));
+        result.setSuccess(true);
+        return result;
     }
 
     /**
      * 用户删除书
      *
-     * @param userBook 书ID和用户ID
+     * @param
      * @return
      */
     @Override
-    public String deleteBooksByUser(UserBook userBook) {
-        userBookDao.deleteById(userBook);
-        return "删除成功";
+    public Result deleteBooksByUser(UserBook userBook) {
+        Result result = new Result();
+        QueryWrapper<UserBook> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("book_id",userBook.getBookId());
+        queryWrapper.eq("user_id",userBook.getUserId());
+        if(userBookDao.delete(queryWrapper)!=0){
+            result.setSuccess(true);
+            result.setMessage("删除成功");
+            return result;
+        }
+        result.setMessage("删除失败");
+        return result;
     }
 
 
