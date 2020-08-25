@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.OrgStatusService;
+import com.demofactory.syscontrol.common.ObjResult;
 import com.demofactory.syscontrol.common.Result;
+import com.demofactory.syscontrol.common.Status;
 import com.demofactory.syscontrol.dao.SysDomainDao;
 import com.demofactory.syscontrol.dao.SysOrgDao;
 import com.demofactory.syscontrol.dao.SysUserDao;
@@ -37,7 +39,7 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
     private SysUserDao sysUserDao;
 
     @Override
-    public Result orgStatusUpdate(SysOrg sysOrg)
+    public ObjResult<String> orgStatusUpdate(SysOrg sysOrg)
     {
         UpdateWrapper<SysOrg> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysOrg.getId());
@@ -48,8 +50,8 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
         updateWrapper1.eq("org_id", sysOrg.getId());
         sysUserDao.update(sysUser, updateWrapper1);
         log.info("result------成功");
-        return Result.OK((sysOrg.getStatus() == 1) ?
-                "启用成功" : ((sysOrg.getStatus() == 2) ? "禁用成功" : "删除成功"));
+        return ObjResult.success((sysOrg.getStatus() == Status.ENABLE) ?
+                "启用成功" : ((sysOrg.getStatus() == Status.DISABLE) ? "禁用成功" : "删除成功"));
     }
 
 
@@ -66,7 +68,7 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
     }
 
     @Override
-    public Result insertSysOrg(SysOrg sysOrg)
+    public ObjResult<String> insertSysOrg(SysOrg sysOrg)
     {
         QueryWrapper<SysOrg> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("domain_id", sysOrg.getDomainId());
@@ -78,16 +80,16 @@ public class OrgStatusServiceImpl extends ServiceImpl<SysOrgDao, SysOrg> impleme
         if (sysDomainDao.selectCount(queryWrapper1) == 0)
         {
             log.info("result-----不存在该域");
-            return Result.failure("不存在该域");
+            return ObjResult.failure("不存在该域");
         }
 
         if (sysOrgDao.selectCount(queryWrapper) > 0)
         {
             log.info("result------已存在该机构");
-            return Result.failure("已存在该机构");
+            return ObjResult.failure("已存在该机构");
         }
         sysOrgDao.insert(sysOrg);
         log.info("result-------插入成功");
-        return Result.OK("插入成功");
+        return ObjResult.success("插入成功");
     }
 }

@@ -2,6 +2,7 @@ package com.demofactory.syscontrol.service.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.demofactory.syscontrol.common.ObjResult;
 import com.demofactory.syscontrol.common.Result;
 import com.demofactory.syscontrol.dao.BookDao;
 import com.demofactory.syscontrol.domain.Books;
@@ -27,7 +28,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     private BookDao bookDao;
 
     @Override
-    public Result insertBook(Books books)
+    public ObjResult<String> insertBook(Books books)
     {
         QueryWrapper<Books> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("book_name", books.getBookName());
@@ -35,11 +36,11 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         if (bookDao.selectCount(queryWrapper) > 0)
         {
             log.info("result------已存在该书");
-            return Result.failure("已存在该书");
+            return ObjResult.failure("已存在该书");
         }
         bookDao.insert(books);
         log.info("result------插入成功");
-        return Result.OK("插入成功");
+        return ObjResult.success("插入成功");
     }
 
     @Override
@@ -59,7 +60,7 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
     }
 
     @Override
-    public Result deleteBook(Long id)
+    public ObjResult<String> deleteBook(Long id)
     {
         QueryWrapper<Books> queryWrapper;
         queryWrapper = new QueryWrapper<>();
@@ -68,10 +69,10 @@ public class BookServiceImpl extends ServiceImpl<BookDao, Books> implements Book
         {
             bookDao.delete(queryWrapper);
             log.info("result------删除成功");
-            return Result.OK("删除成功");
+            return ObjResult.success("删除成功");
         }
         log.info("result------不存在该书");
-        return Result.failure("不存在该书");
+        return ObjResult.failure("不存在该书");
     }
 
 }

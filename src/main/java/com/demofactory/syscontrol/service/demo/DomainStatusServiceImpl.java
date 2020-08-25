@@ -3,7 +3,9 @@ package com.demofactory.syscontrol.service.demo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.demofactory.syscontrol.common.ObjResult;
 import com.demofactory.syscontrol.common.Result;
+import com.demofactory.syscontrol.common.Status;
 import com.demofactory.syscontrol.dao.*;
 import com.demofactory.syscontrol.domain.SysDomain;
 import com.demofactory.syscontrol.domain.SysOrg;
@@ -34,7 +36,7 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
     private SysUserDao sysUserDao;
 
     @Override
-    public Result domainUpdate(SysDomain sysDomain)
+    public ObjResult<String> domainUpdate(SysDomain sysDomain)
     {
         UpdateWrapper<SysDomain> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", sysDomain.getId());
@@ -52,8 +54,8 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
         updateWrapper2.eq("domain_id", sysDomain.getId());
         sysUserDao.update(sysUser, updateWrapper2);
         log.info("result------修改成功");
-        return Result.OK((sysDomain.getStatus() == 1) ?
-                "启用成功" : ((sysDomain.getStatus() == 2) ? "禁用成功" : "删除成功"));
+        return ObjResult.success((sysDomain.getStatus() == Status.ENABLE) ?
+                "启用成功" : ((sysDomain.getStatus() == Status.DISABLE) ? "禁用成功" : "删除成功"));
     }
 
     @Override
@@ -67,17 +69,17 @@ public class DomainStatusServiceImpl extends ServiceImpl<SysDomainDao, SysDomain
     }
 
     @Override
-    public Result insertSysDomain(SysDomain sysDomain)
+    public ObjResult<String> insertSysDomain(SysDomain sysDomain)
     {
         QueryWrapper<SysDomain> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", sysDomain.getName());
         if (sysDomainDao.selectCount(queryWrapper) > 0)
         {
             log.info("result------已存在该域");
-            return Result.failure("已存在该域");
+            return ObjResult.failure("已存在该域");
         }
         sysDomainDao.insert(sysDomain);
         log.info("result------插入成功");
-        return Result.OK("插入成功");
+        return ObjResult.success("插入成功");
     }
 }

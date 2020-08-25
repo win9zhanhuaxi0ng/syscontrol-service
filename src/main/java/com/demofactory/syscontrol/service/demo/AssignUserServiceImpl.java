@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.demofactory.syscontrol.api.AssignUserService;
+import com.demofactory.syscontrol.common.ObjResult;
 import com.demofactory.syscontrol.common.Result;
 import com.demofactory.syscontrol.dao.SysUserDao;
 import com.demofactory.syscontrol.domain.SysUser;
@@ -38,13 +39,13 @@ public class AssignUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impl
     }
 
     @Override
-    public Result updateAssignUser(SysUser sysUser)
+    public ObjResult<String> updateAssignUser(SysUser sysUser)
     {
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("account", sysUser.getAccount());
         sysUserDao.update(sysUser, updateWrapper);
         log.info("result------修改成功");
-        return Result.OK("修改成功");
+        return ObjResult.success("修改成功");
     }
 
 }
