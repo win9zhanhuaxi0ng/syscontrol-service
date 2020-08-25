@@ -148,13 +148,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
      * @return 重设成功 二次密码输入不一致
      */
     @Override
-    public String updatePassword(SysUserDTO sysUserDTO) {
+    public Result updatePassword(SysUserDTO sysUserDTO) {
+        Result result = new Result();
         SysUser sysUser = new SysUser();
         sysUser.setAccount(sysUserDTO.getAccount());
         sysUser.setPassword(sysUserDTO.getPassword());
         //密码正则表达式验证
         if (!RegexUtil.checkRegex(RegexUtil.REGEX_PASSWORD, sysUser.getPassword())) {
-            return "重置密码格式不正确！";
+            result.setMessage("重置密码格式不正确");
+            return result;
         }
         UpdateWrapper<SysUser> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("password", sysUser.getPassword());
@@ -162,9 +164,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUser> impleme
         if (sysUser.getPassword().equals(sysUserDTO.getSecondaryPwd())) {
             sysUser.setPwdUpdateTime(LocalDateTime.now());
             sysUserDao.update(sysUser, updateWrapper);
-            return "重置密码成功";
+            result.setMessage("重置密码成功");
+            result.setSuccess(true);
+            return result;
         }
-        return "两次密码输入不一致";
+        result.setMessage("两次密码输入不一致");
+        return result;
     }
 
     /**
